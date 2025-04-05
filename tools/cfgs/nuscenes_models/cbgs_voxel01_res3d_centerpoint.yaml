@@ -1,5 +1,4 @@
-CLASS_NAMES: ['car','truck', 'construction_vehicle', 'bus', 'trailer',
-              'barrier', 'motorcycle', 'bicycle', 'pedestrian', 'traffic_cone']
+CLASS_NAMES: ['car', 'motorcycle', 'bicycle', 'pedestrian']
 
 DATA_CONFIG:
     _BASE_CONFIG_: cfgs/dataset_configs/nuscenes_dataset.yaml
@@ -32,11 +31,8 @@ MODEL:
 
         CLASS_NAMES_EACH_HEAD: [
             ['car'], 
-            ['truck', 'construction_vehicle'],
-            ['bus', 'trailer'],
-            ['barrier'],
             ['motorcycle', 'bicycle'],
-            ['pedestrian', 'traffic_cone'],
+            ['pedestrian'],
         ]
 
         SHARED_CONV_CHANNEL: 64
@@ -54,7 +50,7 @@ MODEL:
 
         TARGET_ASSIGNER_CONFIG:
             FEATURE_MAP_STRIDE: 8
-            NUM_MAX_OBJS: 500
+            NUM_MAX_OBJS: 300
             GAUSSIAN_OVERLAP: 0.1
             MIN_RADIUS: 2
 
@@ -66,19 +62,19 @@ MODEL:
             }
 
         POST_PROCESSING:
-            SCORE_THRESH: 0.1
+            SCORE_THRESH: 0.2
             POST_CENTER_LIMIT_RANGE: [-61.2, -61.2, -10.0, 61.2, 61.2, 10.0]
-            MAX_OBJ_PER_SAMPLE: 500
+            MAX_OBJ_PER_SAMPLE: 200
             NMS_CONFIG:
                 NMS_TYPE: nms_gpu
-                NMS_THRESH: 0.2
+                NMS_THRESH: 0.25
                 NMS_PRE_MAXSIZE: 1000
                 NMS_POST_MAXSIZE: 83
 
     POST_PROCESSING:
         RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
 
-        EVAL_METRIC: kitti
+        EVAL_METRIC: nuScenes
 
 
 

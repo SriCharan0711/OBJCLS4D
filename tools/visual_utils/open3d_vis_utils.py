@@ -1,3 +1,4 @@
+#objcls4d
 """
 Open3d visualization tool box
 Written by Jihan YANG
@@ -9,21 +10,14 @@ import matplotlib
 import numpy as np
 
 box_colormap = [
-    [1, 1, 1],
-    [0, 1, 0],
-    [0, 1, 1],
-    [1, 1, 0],
+    [1, 0, 0],#red
+    [0, 1, 0],#green 
+    [1, 0, 1],#purple    
+    [1, 1, 0],#yellow
 ]
 
 
 def get_coor_colors(obj_labels):
-    """
-    Args:
-        obj_labels: 1 is ground, labels > 1 indicates different instance cluster
-
-    Returns:
-        rgb: [N, 3]. color for each point.
-    """
     colors = matplotlib.colors.XKCD_COLORS.values()
     max_color_num = obj_labels.max()
 
@@ -74,15 +68,6 @@ def draw_scenes(points, gt_boxes=None, ref_boxes=None, ref_labels=None, ref_scor
 
 
 def translate_boxes_to_open3d_instance(gt_boxes):
-    """
-             4-------- 6
-           /|         /|
-          5 -------- 3 .
-          | |        | |
-          . 7 -------- 1
-          |/         |/
-          2 -------- 0
-    """
     center = gt_boxes[0:3]
     lwh = gt_boxes[3:6]
     axis_angles = np.array([0, 0, gt_boxes[6] + 1e-10])
@@ -103,9 +88,14 @@ def translate_boxes_to_open3d_instance(gt_boxes):
 def draw_box(vis, gt_boxes, color=(0, 1, 0), ref_labels=None, score=None):
     for i in range(gt_boxes.shape[0]):
         line_set, box3d = translate_boxes_to_open3d_instance(gt_boxes[i])
+        
+        # Check for valid ref_labels and handle out-of-range labels
         if ref_labels is None:
             line_set.paint_uniform_color(color)
         else:
+            if ref_labels[i] >= len(box_colormap) or ref_labels[i] < 0:
+                print(f"Skipping invalid label: {ref_labels[i]}")
+                continue  # Skip invalid labels
             line_set.paint_uniform_color(box_colormap[ref_labels[i]])
 
         vis.add_geometry(line_set)
@@ -114,3 +104,4 @@ def draw_box(vis, gt_boxes, color=(0, 1, 0), ref_labels=None, score=None):
         #     corners = box3d.get_box_points()
         #     vis.add_3d_label(corners[5], '%.2f' % score[i])
     return vis
+
